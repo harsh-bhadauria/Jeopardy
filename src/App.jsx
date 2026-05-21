@@ -286,14 +286,14 @@ function BuilderView({ onBack }) {
                 onClick={addRow}
                 className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
               >
-                + Add Row
+                + Row
               </button>
               <button
                 type="button"
                 onClick={addColumn}
                 className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
               >
-                + Add Column
+                + Column
               </button>
               <button
                 type="button"
@@ -301,9 +301,11 @@ function BuilderView({ onBack }) {
                 className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
               >
                 <Download className="h-4 w-4" />
+                Export
               </button>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition">
                 <FileDown className="h-4 w-4" />
+                Import
                 <input
                   type="file"
                   accept="application/json,.json"
