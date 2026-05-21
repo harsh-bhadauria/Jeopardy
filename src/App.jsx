@@ -1372,7 +1372,7 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
           />
           {showAnswer && (
             <>
-              <hr className="w-full max-w-4xl border-t-2 border-dotted border-white/50 mb-8" />
+              <div className="w-full max-w-4xl border-t-2 border-dashed border-white/40 mb-8" />
               <div
                 style={{ animation: 'answerReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards' }}
                 className="text-2xl sm:text-4xl md:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
