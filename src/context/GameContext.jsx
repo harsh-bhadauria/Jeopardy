@@ -33,117 +33,104 @@ const createDefaultGame = () => ({
 })
 
 export const THEMES = {
+  legacy: {
+    name: 'OG Jeopardy',
+    bg: 'bg-[#1b2575]',
+    bgHex: '#1b2575',
+    boardBg: 'bg-[#0f1754]',
+    cellBg: 'bg-[#1b2575]',
+    primary: 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-600/20',
+    primaryText: 'text-amber-500',
+    primaryBorder: 'hover:border-amber-500',
+    primaryShadow: '',
+    primaryBgLight: 'bg-amber-600/20 group-hover:bg-amber-600/30',
+    accent: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-600/20',
+    accentText: 'text-yellow-500',
+    accentBorder: 'hover:border-yellow-500',
+    accentShadow: '',
+    accentBgLight: 'bg-yellow-600/20 group-hover:bg-yellow-600/30',
+    border: 'border-white/60',
+    shadow: '',
+    text: 'text-amber-500',
+    bgLight: 'bg-amber-600/20 group-hover:bg-amber-600/30',
+    cellHover: 'hover:bg-yellow-500/20 hover:border-yellow-400',
+  },
   gold: {
-    name: 'Classic Gold',
-    bg: 'bg-[#2d3b9f]',
-    bgHex: '#2d3b9f',
-    boardBg: 'bg-[#1b2575]',
-    cellBg: 'bg-[#2d3b9f]',
+    name: 'Championship Gold',
+    bg: 'bg-[#0d0d0e]',
+    bgHex: '#0d0d0e',
+    boardBg: 'bg-[#1a1a1c]',
+    cellBg: 'bg-[#252528]',
     primary: 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-500/20',
     primaryText: 'text-amber-400',
     primaryBorder: 'hover:border-amber-400',
-    primaryShadow: 'hover:shadow-amber-500/30',
+    primaryShadow: '',
     primaryBgLight: 'bg-amber-500/20 group-hover:bg-amber-500/30',
-    accent: 'bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500/20',
+    accent: 'bg-yellow-600 hover:bg-yellow-500 focus:ring-yellow-500/20',
     accentText: 'text-yellow-400',
     accentBorder: 'hover:border-yellow-400',
-    accentShadow: 'hover:shadow-yellow-500/30',
+    accentShadow: '',
     accentBgLight: 'bg-yellow-500/20 group-hover:bg-yellow-500/30',
     border: 'border-amber-400',
-    shadow: 'shadow-amber-500/30',
+    shadow: '',
     text: 'text-amber-400',
     bgLight: 'bg-amber-500/20 group-hover:bg-amber-500/30',
+    font: 'font-gold',
+    cellHover: 'hover:bg-amber-600 hover:border-amber-400',
   },
-  cyan: {
-    name: 'Cyber Cyan',
-    bg: 'bg-[#2d3b9f]',
-    bgHex: '#2d3b9f',
-    boardBg: 'bg-[#1b2575]',
-    cellBg: 'bg-[#2d3b9f]',
-    primary: 'bg-cyan-600 hover:bg-cyan-700 focus:ring-cyan-600/20',
-    primaryText: 'text-cyan-400',
-    primaryBorder: 'hover:border-cyan-400',
-    primaryShadow: 'hover:shadow-cyan-500/30',
-    primaryBgLight: 'bg-cyan-500/20 group-hover:bg-cyan-500/30',
-    accent: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-600/20',
-    accentText: 'text-blue-400',
-    accentBorder: 'hover:border-blue-400',
-    accentShadow: 'hover:shadow-blue-500/30',
-    accentBgLight: 'bg-blue-500/20 group-hover:bg-blue-500/30',
-    border: 'border-cyan-400',
-    shadow: 'shadow-cyan-500/30',
-    text: 'text-cyan-400',
-    bgLight: 'bg-cyan-500/20 group-hover:bg-cyan-500/30',
+  gothic: {
+    name: 'Gothic Velvet',
+    bg: 'bg-[#150a0a]',
+    bgHex: '#150a0a',
+    boardBg: 'bg-[#240f0f]',
+    cellBg: 'bg-[#341414]',
+    primary: 'bg-red-800 hover:bg-red-700 focus:ring-red-900/20',
+    primaryText: 'text-red-400',
+    primaryBorder: 'hover:border-red-400',
+    primaryShadow: '',
+    primaryBgLight: 'bg-red-950/40 group-hover:bg-red-900/40',
+    accent: 'bg-amber-700 hover:bg-amber-600 focus:ring-amber-700/20',
+    accentText: 'text-amber-400',
+    accentBorder: 'hover:border-amber-400',
+    accentShadow: '',
+    accentBgLight: 'bg-amber-500/20 group-hover:bg-amber-500/30',
+    border: 'border-red-700',
+    shadow: '',
+    text: 'text-red-400',
+    bgLight: 'bg-red-500/20 group-hover:bg-red-500/30',
+    font: 'font-gothic',
+    cellHover: 'hover:bg-red-900/30 hover:border-red-500',
   },
-  emerald: {
-    name: 'Emerald Mint',
-    bg: 'bg-[#052c16]',
-    bgHex: '#052c16',
-    boardBg: 'bg-[#02180d]',
-    cellBg: 'bg-[#094024]',
-    primary: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600/20',
-    primaryText: 'text-emerald-400',
-    primaryBorder: 'hover:border-emerald-400',
-    primaryShadow: 'hover:shadow-emerald-500/30',
-    primaryBgLight: 'bg-emerald-500/20 group-hover:bg-emerald-500/30',
-    accent: 'bg-teal-600 hover:bg-teal-700 focus:ring-teal-600/20',
-    accentText: 'text-teal-400',
-    accentBorder: 'hover:border-teal-400',
-    accentShadow: 'hover:shadow-teal-500/30',
-    accentBgLight: 'bg-teal-500/20 group-hover:bg-teal-500/30',
-    border: 'border-emerald-400',
-    shadow: 'shadow-emerald-500/30',
-    text: 'text-emerald-400',
-    bgLight: 'bg-emerald-500/20 group-hover:bg-emerald-500/30',
-  },
-  purple: {
-    name: 'Royal Purple',
-    bg: 'bg-[#1e1b4b]',
-    bgHex: '#1e1b4b',
-    boardBg: 'bg-[#0f0b3b]',
-    cellBg: 'bg-[#2d257a]',
-    primary: 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-600/20',
-    primaryText: 'text-indigo-400',
-    primaryBorder: 'hover:border-indigo-400',
-    primaryShadow: 'hover:shadow-indigo-500/30',
-    primaryBgLight: 'bg-indigo-500/20 group-hover:bg-indigo-500/30',
-    accent: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-600/20',
-    accentText: 'text-blue-400',
-    accentBorder: 'hover:border-blue-400',
-    accentShadow: 'hover:shadow-blue-500/30',
-    accentBgLight: 'bg-blue-500/20 group-hover:bg-blue-500/30',
-    border: 'border-indigo-400',
-    shadow: 'shadow-indigo-500/30',
-    text: 'text-indigo-400',
-    bgLight: 'bg-indigo-500/20 group-hover:bg-indigo-500/30',
-  },
-  slate: {
-    name: 'Midnight Slate',
-    bg: 'bg-[#0f172a]',
-    bgHex: '#0f172a',
-    boardBg: 'bg-[#020617]',
+  nord: {
+    name: 'Nordic Aurora',
+    bg: 'bg-[#0e1626]',
+    bgHex: '#0e1626',
+    boardBg: 'bg-[#151f32]',
     cellBg: 'bg-[#1e293b]',
-    primary: 'bg-slate-700 hover:bg-slate-600 focus:ring-slate-700/20',
-    primaryText: 'text-slate-200',
-    primaryBorder: 'hover:border-slate-300',
-    primaryShadow: 'hover:shadow-slate-500/30',
-    primaryBgLight: 'bg-slate-500/20 group-hover:bg-slate-500/30',
-    accent: 'bg-zinc-700 hover:bg-zinc-600 focus:ring-zinc-700/20',
-    accentText: 'text-zinc-200',
-    accentBorder: 'hover:border-zinc-300',
-    accentShadow: 'hover:shadow-zinc-500/30',
-    accentBgLight: 'bg-zinc-500/20 group-hover:bg-zinc-500/30',
-    border: 'border-slate-400',
-    shadow: 'shadow-slate-500/30',
-    text: 'text-slate-300',
-    bgLight: 'bg-slate-500/20 group-hover:bg-slate-500/30',
+    primary: 'bg-teal-600 hover:bg-teal-500 focus:ring-teal-500/20',
+    primaryText: 'text-teal-400',
+    primaryBorder: 'hover:border-teal-400',
+    primaryShadow: '',
+    primaryBgLight: 'bg-teal-500/10 group-hover:bg-teal-500/20',
+    accent: 'bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-500/20',
+    accentText: 'text-indigo-400',
+    accentBorder: 'hover:border-indigo-400',
+    accentShadow: '',
+    accentBgLight: 'bg-indigo-500/10 group-hover:bg-indigo-500/20',
+    border: 'border-teal-500/30',
+    shadow: '',
+    text: 'text-teal-400',
+    bgLight: 'bg-teal-500/10 group-hover:bg-teal-500/20',
+    font: 'font-nord',
+    cellHover: 'hover:bg-teal-500/20 hover:border-teal-400',
   },
 }
 
 export function GameProvider({ children }) {
   const [game, setGame] = useState(createDefaultGame)
   const [theme, setThemeState] = useState(() => {
-    return localStorage.getItem('jeopardy-theme') || 'gold'
+    const saved = localStorage.getItem('jeopardy-theme')
+    return saved && THEMES[saved] ? saved : 'legacy'
   })
 
   const setTheme = (newTheme) => {
@@ -508,8 +495,8 @@ function normalizeGame(raw) {
 
   const categories = Array.isArray(raw.categories)
     ? raw.categories
-        .filter((category) => category && typeof category === 'object')
-        .map((category, categoryIndex) => normalizeCategory(category, categoryIndex))
+      .filter((category) => category && typeof category === 'object')
+      .map((category, categoryIndex) => normalizeCategory(category, categoryIndex))
     : []
 
   const rowCount = Math.max(DEFAULT_ROW_COUNT, ...categories.map((category) => category.clues.length))
@@ -522,20 +509,20 @@ function normalizeGame(raw) {
     categories:
       categories.length > 0
         ? categories.map((category, categoryIndex) => ({
-            ...category,
-            clues: ensureRowCount(category.clues, rowPoints),
-          }))
+          ...category,
+          clues: ensureRowCount(category.clues, rowPoints),
+        }))
         : Array.from({ length: DEFAULT_CATEGORY_COUNT }, (_, categoryIndex) =>
-            createCategoryWithRows(categoryIndex, rowPoints),
-          ),
+          createCategoryWithRows(categoryIndex, rowPoints),
+        ),
   }
 }
 
 function normalizeCategory(rawCategory, categoryIndex) {
   const clues = Array.isArray(rawCategory.clues)
     ? rawCategory.clues
-        .filter((clue) => clue && typeof clue === 'object')
-        .map((clue, clueIndex) => normalizeClue(clue, clueIndex))
+      .filter((clue) => clue && typeof clue === 'object')
+      .map((clue, clueIndex) => normalizeClue(clue, clueIndex))
     : []
 
   return {
@@ -581,9 +568,9 @@ function ensureRowCount(clues, rowPoints) {
 function normalizeRowPoints(rawRowPoints, rowCount, categories) {
   const fromRaw = Array.isArray(rawRowPoints)
     ? rawRowPoints.map((value, index) => {
-        const points = Number(value)
-        return Number.isFinite(points) ? points : (index + 1) * DEFAULT_POINTS_STEP
-      })
+      const points = Number(value)
+      return Number.isFinite(points) ? points : (index + 1) * DEFAULT_POINTS_STEP
+    })
     : []
 
   if (fromRaw.length > 0) {

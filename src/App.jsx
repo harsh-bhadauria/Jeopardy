@@ -107,7 +107,7 @@ function SettingsModal({ isOpen, onClose }) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className={`fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200 ${t.font || 'font-sans'}`}>
       <div className="relative w-full max-w-xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95 duration-200 text-left">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -216,7 +216,7 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup, openSettings }) {
   const t = THEMES[theme] || THEMES.gold
 
   return (
-    <main className={`min-h-screen ${t.bg} flex flex-col items-center justify-center p-6 text-slate-100 relative`}>
+    <main className={`min-h-screen ${t.bg} flex flex-col items-center justify-center p-6 text-slate-100 relative ${t.font || 'font-sans'}`}>
       <div className="absolute top-6 right-6">
         <button
           type="button"
@@ -412,7 +412,7 @@ function BuilderView({ onBack, openSettings }) {
   }
 
   return (
-    <main className={`min-h-screen ${t.bg} p-3 text-slate-100 md:p-4`}>
+    <main className={`min-h-screen ${t.bg} p-3 text-slate-100 md:p-4 ${t.font || 'font-sans'}`}>
       <div className="mx-auto flex w-full max-w-full flex-col gap-4 px-4">
         <header ref={headerRef} className="rounded-xl bg-slate-900 p-4 shadow-lg">
           <div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -1110,7 +1110,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
   )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 ${t.font || 'font-sans'}`}>
       <div className="w-full max-w-5xl overflow-hidden rounded-xl border border-slate-700 bg-slate-900 text-slate-50 shadow-2xl">
         <div className={`flex items-center justify-between px-4 py-3 text-white font-semibold ${t.primary}`}>
           <div className="text-lg font-medium">Enter {title} clue</div>
@@ -1251,7 +1251,7 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart, openSetti
   }
 
   return (
-    <main className={`min-h-screen ${t.bg} flex items-center justify-center p-6 text-slate-100`}>
+    <main className={`min-h-screen ${t.bg} flex items-center justify-center p-6 text-slate-100 ${t.font || 'font-sans'}`}>
       <div className="mx-auto w-full max-w-xl rounded-2xl border-2 border-white/10 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-sm">
         <div className="mb-6">
           <GameMenu onBack={onBack} openSettings={openSettings} align="left" />
@@ -1359,7 +1359,7 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
   }, [rowCount, game.categories.length])
 
   return (
-    <main className={`h-screen ${t.bg} px-3 pt-6 text-slate-100 md:px-4 md:pt-8 flex flex-col overflow-hidden`} style={{ paddingBottom: 70 }}>
+    <main className={`h-screen ${t.bg} px-3 pt-6 text-slate-100 md:px-4 md:pt-8 flex flex-col overflow-hidden ${t.font || 'font-sans'}`} style={{ paddingBottom: 70 }}>
       <div className="flex w-full max-w-full flex-col gap-12 px-4 flex-1 min-h-0">
 
         {/* Title row: Home | Game Title | Score Pool — no dark bar */}
@@ -1412,16 +1412,7 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
                           setActiveCell({ categoryId: category.id, categoryName: category.name, rowIndex, points, clue, originRect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height } })
                         }
                       }}
-                      className={`flex h-full w-full items-center justify-center rounded-[4px] border-2 ${t.cellBg} box-border text-white transition-all border-black/50 cursor-pointer hover:scale-[1.03] shadow-md font-bold text-2xl hover:text-white ${theme === 'gold'
-                          ? 'hover:bg-amber-600 hover:border-amber-400'
-                          : theme === 'emerald'
-                            ? 'hover:bg-emerald-600 hover:border-emerald-400'
-                            : theme === 'cyan'
-                              ? 'hover:bg-cyan-600 hover:border-cyan-400'
-                              : theme === 'purple'
-                                ? 'hover:bg-indigo-600 hover:border-indigo-400'
-                                : 'hover:bg-slate-600 hover:border-slate-300'
-                        } ${isPlayed ? 'opacity-40' : ''}`}
+                      className={`flex h-full w-full items-center justify-center rounded-[4px] border-2 ${t.cellBg} box-border text-white transition-all border-black/50 cursor-pointer hover:scale-[1.03] shadow-md font-bold text-2xl hover:text-white ${t.cellHover || 'hover:bg-slate-600 hover:border-slate-300'} ${isPlayed ? 'opacity-40' : ''}`}
                     >
                       <span>{points}</span>
                     </button>
@@ -1548,6 +1539,7 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
 
   return (
     <div
+      className={t.font || 'font-sans'}
       style={{
         position: 'fixed',
         zIndex: 100,
@@ -1582,15 +1574,15 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
 
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
           <div
-            className="text-3xl sm:text-5xl md:text-7xl font-semibold leading-tight drop-shadow-md mb-8 max-w-6xl break-words"
+            className="clue-prompt-text text-3xl sm:text-5xl md:text-7xl font-semibold leading-tight drop-shadow-md mb-8 max-w-6xl break-words"
             dangerouslySetInnerHTML={{ __html: questionHtml || '<span class="text-slate-400 italic">No question</span>' }}
           />
           {showAnswer && (
             <>
-              <div className={`w-full max-w-4xl border-t-2 border-dashed mb-8 ${t.border}`} />
+              <div className={`w-full max-w-6xl border-t-4 border-dotted mb-8 ${t.border}`} />
               <div
                 style={{ animation: 'answerReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards' }}
-                className="text-2xl sm:text-4xl md:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
+                className="clue-prompt-text text-2xl sm:text-4xl md:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
                 dangerouslySetInnerHTML={{ __html: answerHtml || '<span class="text-slate-400 italic">No answer</span>' }}
               />
             </>

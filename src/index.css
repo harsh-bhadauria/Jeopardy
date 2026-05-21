@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300..700&family=Outfit:wght@300..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,4 +30,62 @@ p {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* --- Theme Animation Keyframes --- */
+
+@keyframes answerReveal {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --- Theme Overrides & Scopes --- */
+
+/* === Championship Gold === */
+.font-gold {
+  font-family: 'Outfit', sans-serif;
+}
+
+.font-gold h1,
+.font-gold h2 {
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+
+/* === Gothic Velvet === */
+.font-gothic {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Deep royal velvet radial background */
+main.font-gothic,
+div.font-gothic {
+  background: radial-gradient(circle, #200a0a 0%, #060202 100%) !important;
+}
+
+.font-gothic h1,
+.font-gothic h2 {
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* === Nordic Aurora === */
+.font-nord {
+  font-family: 'Outfit', sans-serif;
+}
+
+@keyframes auroraFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+main.font-nord,
+div.font-nord {
+  background: linear-gradient(-45deg, #0e1626, #14233c, #090e18, #182e4e) !important;
+  background-size: 400% 400% !important;
+  animation: auroraFlow 25s ease infinite !important;
+}
+
+
+
 
