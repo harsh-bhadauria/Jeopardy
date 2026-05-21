@@ -1,0 +1,141 @@
+{
+  "title": "Random Trivia Board",
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "Music",
+      "clues": [
+        {
+          "id": "clue-1-1",
+          "question": "Which British band released 'Abbey Road' in 1969?",
+          "answer": "The Beatles"
+        },
+        {
+          "id": "clue-1-2",
+          "question": "How many strings does a standard violin have?",
+          "answer": "4"
+        },
+        {
+          "id": "clue-1-3",
+          "question": "What is the lowest note on a piano?",
+          "answer": "A0"
+        },
+        null,
+        {
+          "id": "clue-1-5",
+          "question": "Which artist has won the most Grammy Awards?",
+          "answer": "Beyoncé"
+        }
+      ]
+    },
+    {
+      "id": "cat-2",
+      "name": "D&D",
+      "clues": [
+        {
+          "id": "clue-2-1",
+          "question": "How many sides does a d20 have?",
+          "answer": "20"
+        },
+        null,
+        {
+          "id": "clue-2-3",
+          "question": "What is the typical starting ability score for creating a character?",
+          "answer": "10 or 11"
+        },
+        {
+          "id": "clue-2-4",
+          "question": "What class is known for healing and support magic?",
+          "answer": "Cleric"
+        },
+        {
+          "id": "clue-2-5",
+          "question": "What is the name of the fantasy world where most D&D campaigns take place?",
+          "answer": "Forgotten Realms"
+        }
+      ]
+    },
+    {
+      "id": "cat-3",
+      "name": "Android",
+      "clues": [
+        {
+          "id": "clue-3-1",
+          "question": "In what year was Android first released?",
+          "answer": "2008"
+        },
+        {
+          "id": "clue-3-2",
+          "question": "Which company developed Android?",
+          "answer": "Google"
+        },
+        null,
+        {
+          "id": "clue-3-4",
+          "question": "What programming language is primarily used for Android development?",
+          "answer": "Kotlin or Java"
+        },
+        {
+          "id": "clue-3-5",
+          "question": "What is the mascot of Android?",
+          "answer": "Andy or the Android robot"
+        }
+      ]
+    },
+    {
+      "id": "cat-4",
+      "name": "Jabalpur",
+      "clues": [
+        {
+          "id": "clue-4-1",
+          "question": "In which Indian state is Jabalpur located?",
+          "answer": "Madhya Pradesh"
+        },
+        {
+          "id": "clue-4-2",
+          "question": "What are the famous marble rocks near Jabalpur called?",
+          "answer": "Marble Rocks or Bhedaghat"
+        },
+        {
+          "id": "clue-4-3",
+          "question": "Which river flows through Jabalpur?",
+          "answer": "Narmada River"
+        },
+        null,
+        {
+          "id": "clue-4-5",
+          "question": "Jabalpur is known for producing which type of fabric historically?",
+          "answer": "Muslin or Cotton"
+        }
+      ]
+    },
+    {
+      "id": "cat-5",
+      "name": "Harry Potter",
+      "clues": [
+        {
+          "id": "clue-5-1",
+          "question": "What is the spell that disarms an opponent?",
+          "answer": "Expelliarmus"
+        },
+        {
+          "id": "clue-5-2",
+          "question": "How many houses are there in Hogwarts?",
+          "answer": "4"
+        },
+        {
+          "id": "clue-5-3",
+          "question": "What is Dumbledore's full first name?",
+          "answer": "Albus Percival Wulfric Brian"
+        },
+        {
+          "id": "clue-5-4",
+          "question": "What animal is Harry's patronus?",
+          "answer": "Stag"
+        },
+        null
+      ]
+    }
+  ],
+  "rowPoints": [100, 200, 300, 400, 500]
+}
