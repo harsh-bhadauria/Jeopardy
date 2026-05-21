@@ -97,10 +97,10 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
           <button
             type="button"
             onClick={onOpenBuilder}
-            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-purple-500/30"
+            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-indigo-500/30"
           >
-            <div className="mb-6 rounded-full bg-purple-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-purple-500/30">
-              <PencilLine className="h-10 w-10 text-purple-400" />
+            <div className="mb-6 rounded-full bg-indigo-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-indigo-500/30">
+              <PencilLine className="h-10 w-10 text-indigo-400" />
             </div>
             <h2 className="mb-3 text-2xl font-bold text-white tracking-wide">Create Board</h2>
             <p className="text-sm leading-relaxed text-slate-300">
@@ -111,10 +111,10 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
           <button
             type="button"
             onClick={onOpenPlaySetup}
-            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-violet-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-violet-500/30"
+            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-blue-500/30"
           >
-            <div className="mb-6 rounded-full bg-violet-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-violet-500/30">
-              <Play className="h-10 w-10 text-violet-400" />
+            <div className="mb-6 rounded-full bg-blue-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-blue-500/30">
+              <Play className="h-10 w-10 text-blue-400" />
             </div>
             <h2 className="mb-3 text-2xl font-bold text-white tracking-wide">Play Game</h2>
             <p className="text-sm leading-relaxed text-slate-300">
@@ -284,26 +284,26 @@ function BuilderView({ onBack }) {
               <button
                 type="button"
                 onClick={addRow}
-                className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
+                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
               >
                 + Row
               </button>
               <button
                 type="button"
                 onClick={addColumn}
-                className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
+                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
               >
                 + Column
               </button>
               <button
                 type="button"
                 onClick={exportFile}
-                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition"
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
               >
                 <FileUp className="h-4 w-4" />
                 Export
               </button>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition">
                 <FileDown className="h-4 w-4" />
                 Import
                 <input
@@ -573,7 +573,7 @@ function BuilderView({ onBack }) {
                           </div>
                         </div>
 
-                        <div className="pointer-events-none absolute inset-0 rounded-[4px] border border-black bg-purple-600 [backface-visibility:hidden] [transform:rotateY(180deg)] box-border">
+                        <div className="pointer-events-none absolute inset-0 rounded-[4px] border border-black bg-indigo-600 [backface-visibility:hidden] [transform:rotateY(180deg)] box-border">
                           <div className={`h-full w-full flex items-center justify-center px-2 text-center font-bold leading-tight text-white overflow-hidden break-words whitespace-normal ${answerHtml ? answerTextSize : 'text-base'}`}>
                             <div className="w-full line-clamp-4">
                               {answerHtml ? (
@@ -898,7 +898,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
       <div className="w-full max-w-5xl overflow-hidden rounded-xl border border-slate-700 bg-slate-900 text-slate-50 shadow-2xl">
-        <div className="flex items-center justify-between bg-purple-600 px-4 py-3 text-white font-semibold">
+        <div className="flex items-center justify-between bg-indigo-600 px-4 py-3 text-white font-semibold">
           <div className="text-lg font-medium">Enter {title} clue</div>
           <button type="button" onClick={onClose} className="rounded px-2 py-1 text-sm hover:bg-white/15">
             Close without Saving [ESC]
@@ -1055,7 +1055,7 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
             <span className="mb-2 block text-sm font-semibold text-slate-300 uppercase tracking-wider">
               1. Load Game File
             </span>
-            <label className={`flex cursor-pointer items-center justify-between rounded-xl border-2 ${fileLoaded ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-violet-400/50'} p-4 transition-all`}>
+            <label className={`flex cursor-pointer items-center justify-between rounded-xl border-2 ${fileLoaded ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-blue-400/50'} p-4 transition-all`}>
               <div className="flex items-center gap-3">
                 <FileUp className={`h-6 w-6 ${fileLoaded ? 'text-emerald-400' : 'text-slate-400'}`} />
                 <div>
@@ -1102,7 +1102,7 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
           type="button"
           onClick={onStart}
           disabled={!fileLoaded}
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-6 py-4 text-lg font-bold text-white transition-all hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+          className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-lg font-bold text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
         >
           <Play className="h-5 w-5" />
           Start Game
@@ -1166,7 +1166,7 @@ function PlayHostView({ players, setPlayers, onBack }) {
             {game.title || 'Trivia Board'}
           </h1>
 
-          <div className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white shrink-0">
+          <div className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shrink-0">
             Score Pool: {totalScore}
           </div>
         </div>
