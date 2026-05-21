@@ -32,8 +32,124 @@ const createDefaultGame = () => ({
   ),
 })
 
+export const THEMES = {
+  gold: {
+    name: 'Classic Gold',
+    bg: 'bg-[#2d3b9f]',
+    bgHex: '#2d3b9f',
+    boardBg: 'bg-[#1b2575]',
+    cellBg: 'bg-[#2d3b9f]',
+    primary: 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-500/20',
+    primaryText: 'text-amber-400',
+    primaryBorder: 'hover:border-amber-400',
+    primaryShadow: 'hover:shadow-amber-500/30',
+    primaryBgLight: 'bg-amber-500/20 group-hover:bg-amber-500/30',
+    accent: 'bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500/20',
+    accentText: 'text-yellow-400',
+    accentBorder: 'hover:border-yellow-400',
+    accentShadow: 'hover:shadow-yellow-500/30',
+    accentBgLight: 'bg-yellow-500/20 group-hover:bg-yellow-500/30',
+    border: 'border-amber-400',
+    shadow: 'shadow-amber-500/30',
+    text: 'text-amber-400',
+    bgLight: 'bg-amber-500/20 group-hover:bg-amber-500/30',
+  },
+  cyan: {
+    name: 'Cyber Cyan',
+    bg: 'bg-[#2d3b9f]',
+    bgHex: '#2d3b9f',
+    boardBg: 'bg-[#1b2575]',
+    cellBg: 'bg-[#2d3b9f]',
+    primary: 'bg-cyan-600 hover:bg-cyan-700 focus:ring-cyan-600/20',
+    primaryText: 'text-cyan-400',
+    primaryBorder: 'hover:border-cyan-400',
+    primaryShadow: 'hover:shadow-cyan-500/30',
+    primaryBgLight: 'bg-cyan-500/20 group-hover:bg-cyan-500/30',
+    accent: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-600/20',
+    accentText: 'text-blue-400',
+    accentBorder: 'hover:border-blue-400',
+    accentShadow: 'hover:shadow-blue-500/30',
+    accentBgLight: 'bg-blue-500/20 group-hover:bg-blue-500/30',
+    border: 'border-cyan-400',
+    shadow: 'shadow-cyan-500/30',
+    text: 'text-cyan-400',
+    bgLight: 'bg-cyan-500/20 group-hover:bg-cyan-500/30',
+  },
+  emerald: {
+    name: 'Emerald Mint',
+    bg: 'bg-[#052c16]',
+    bgHex: '#052c16',
+    boardBg: 'bg-[#02180d]',
+    cellBg: 'bg-[#094024]',
+    primary: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-600/20',
+    primaryText: 'text-emerald-400',
+    primaryBorder: 'hover:border-emerald-400',
+    primaryShadow: 'hover:shadow-emerald-500/30',
+    primaryBgLight: 'bg-emerald-500/20 group-hover:bg-emerald-500/30',
+    accent: 'bg-teal-600 hover:bg-teal-700 focus:ring-teal-600/20',
+    accentText: 'text-teal-400',
+    accentBorder: 'hover:border-teal-400',
+    accentShadow: 'hover:shadow-teal-500/30',
+    accentBgLight: 'bg-teal-500/20 group-hover:bg-teal-500/30',
+    border: 'border-emerald-400',
+    shadow: 'shadow-emerald-500/30',
+    text: 'text-emerald-400',
+    bgLight: 'bg-emerald-500/20 group-hover:bg-emerald-500/30',
+  },
+  purple: {
+    name: 'Royal Purple',
+    bg: 'bg-[#1e1b4b]',
+    bgHex: '#1e1b4b',
+    boardBg: 'bg-[#0f0b3b]',
+    cellBg: 'bg-[#2d257a]',
+    primary: 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-600/20',
+    primaryText: 'text-indigo-400',
+    primaryBorder: 'hover:border-indigo-400',
+    primaryShadow: 'hover:shadow-indigo-500/30',
+    primaryBgLight: 'bg-indigo-500/20 group-hover:bg-indigo-500/30',
+    accent: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-600/20',
+    accentText: 'text-blue-400',
+    accentBorder: 'hover:border-blue-400',
+    accentShadow: 'hover:shadow-blue-500/30',
+    accentBgLight: 'bg-blue-500/20 group-hover:bg-blue-500/30',
+    border: 'border-indigo-400',
+    shadow: 'shadow-indigo-500/30',
+    text: 'text-indigo-400',
+    bgLight: 'bg-indigo-500/20 group-hover:bg-indigo-500/30',
+  },
+  slate: {
+    name: 'Midnight Slate',
+    bg: 'bg-[#0f172a]',
+    bgHex: '#0f172a',
+    boardBg: 'bg-[#020617]',
+    cellBg: 'bg-[#1e293b]',
+    primary: 'bg-slate-700 hover:bg-slate-600 focus:ring-slate-700/20',
+    primaryText: 'text-slate-200',
+    primaryBorder: 'hover:border-slate-300',
+    primaryShadow: 'hover:shadow-slate-500/30',
+    primaryBgLight: 'bg-slate-500/20 group-hover:bg-slate-500/30',
+    accent: 'bg-zinc-700 hover:bg-zinc-600 focus:ring-zinc-700/20',
+    accentText: 'text-zinc-200',
+    accentBorder: 'hover:border-zinc-300',
+    accentShadow: 'hover:shadow-zinc-500/30',
+    accentBgLight: 'bg-zinc-500/20 group-hover:bg-zinc-500/30',
+    border: 'border-slate-400',
+    shadow: 'shadow-slate-500/30',
+    text: 'text-slate-300',
+    bgLight: 'bg-slate-500/20 group-hover:bg-slate-500/30',
+  },
+}
+
 export function GameProvider({ children }) {
   const [game, setGame] = useState(createDefaultGame)
+  const [theme, setThemeState] = useState(() => {
+    return localStorage.getItem('jeopardy-theme') || 'gold'
+  })
+
+  const setTheme = (newTheme) => {
+    localStorage.setItem('jeopardy-theme', newTheme)
+    setThemeState(newTheme)
+  }
 
   const setGameTitle = (title) => {
     setGame((previous) => ({ ...previous, title }))
@@ -331,8 +447,10 @@ export function GameProvider({ children }) {
       updateRowPoints,
       clearClueImage,
       ensureCell,
+      theme,
+      setTheme,
     }),
-    [game],
+    [game, theme],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>

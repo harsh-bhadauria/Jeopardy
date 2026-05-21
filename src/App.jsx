@@ -13,6 +13,11 @@ import {
   Italic,
   Image,
   Code,
+  Palette,
+  Settings,
+  Menu,
+  X,
+  HelpCircle,
 } from 'lucide-react'
 import {
   GameProvider,
@@ -20,6 +25,7 @@ import {
   fileToBase64,
   exportGameAsJson,
   importGameFromFile,
+  THEMES,
 } from './context/GameContext'
 
 function App() {
@@ -30,61 +36,200 @@ function App() {
   )
 }
 
+function GameMenu({ onBack, openSettings, align = 'left', className = '' }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="rounded-full bg-slate-900/90 p-2.5 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 hover:scale-105 transition shadow-lg cursor-pointer flex items-center justify-center shrink-0"
+        title="Menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
+          <div
+            className={`absolute ${align === 'left' ? 'left-0' : 'right-0'
+              } mt-2 w-56 rounded-xl border border-slate-700 bg-slate-950 p-2 shadow-2xl z-40 animate-in fade-in slide-in-from-top-2 duration-150 text-left`}
+          >
+            <div className="space-y-1">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false)
+                    onBack()
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4 text-slate-400" />
+                  Return to Home
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false)
+                  openSettings()
+                }}
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+              >
+                <Settings className="h-4 w-4 text-slate-400" />
+                Settings
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function SettingsModal({ isOpen, onClose }) {
+  const { theme, setTheme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95 duration-200 text-left">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Settings className="h-5 w-5 text-slate-400" />
+            Settings
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+            <div className="max-w-xs">
+              <label className="block text-sm font-semibold text-white uppercase tracking-wider">
+                Theme Palette
+              </label>
+              <p className="text-xs text-slate-400 mt-1">
+                Customize the look and feel of the board and background.
+              </p>
+            </div>
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="w-full sm:w-60 rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-sm font-semibold text-white focus:border-slate-500 focus:outline-none cursor-pointer"
+            >
+              {Object.entries(THEMES).map(([id, themeObj]) => (
+                <option key={id} value={id} className="bg-slate-900 text-white font-medium">
+                  {themeObj.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-end border-t border-slate-800 pt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className={`rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition ${t.primary}`}
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Shell() {
   const [screen, setScreen] = useState('home')
   const [playerCount, setPlayerCount] = useState(2)
   const [players, setPlayers] = useState([])
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-  if (screen === 'builder') {
-    return <BuilderView onBack={() => setScreen('home')} />
-  }
-
-  if (screen === 'play-setup') {
-    return (
-      <PlaySetupView
-        playerCount={playerCount}
-        setPlayerCount={setPlayerCount}
-        onBack={() => setScreen('home')}
-        onStart={() => {
-          const nextPlayers = Array.from({ length: playerCount }, (_, index) => ({
-            id: crypto.randomUUID(),
-            name: `Player ${index + 1}`,
-            score: 0,
-          }))
-          setPlayers(nextPlayers)
-          setScreen('play')
-        }}
-      />
-    )
-  }
-
-  if (screen === 'play') {
-    return (
-      <PlayHostView
-        players={players}
-        setPlayers={setPlayers}
-        onBack={() => setScreen('home')}
-      />
-    )
-  }
+  const openSettings = () => setIsSettingsOpen(true)
 
   return (
-    <HomeView
-      onOpenBuilder={() => setScreen('builder')}
-      onOpenPlaySetup={() => setScreen('play-setup')}
-    />
+    <>
+      {screen === 'builder' && (
+        <BuilderView onBack={() => setScreen('home')} openSettings={openSettings} />
+      )}
+      {screen === 'play-setup' && (
+        <PlaySetupView
+          playerCount={playerCount}
+          setPlayerCount={setPlayerCount}
+          onBack={() => setScreen('home')}
+          onStart={() => {
+            const nextPlayers = Array.from({ length: playerCount }, (_, index) => ({
+              id: crypto.randomUUID(),
+              name: `Player ${index + 1}`,
+              score: 0,
+            }))
+            setPlayers(nextPlayers)
+            setScreen('play')
+          }}
+          openSettings={openSettings}
+        />
+      )}
+      {screen === 'play' && (
+        <PlayHostView
+          players={players}
+          setPlayers={setPlayers}
+          onBack={() => setScreen('home')}
+          openSettings={openSettings}
+        />
+      )}
+      {screen === 'home' && (
+        <HomeView
+          onOpenBuilder={() => setScreen('builder')}
+          onOpenPlaySetup={() => setScreen('play-setup')}
+          openSettings={openSettings}
+        />
+      )}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+    </>
   )
 }
 
-function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
-  const { setGame } = useGame()
-
-
+function HomeView({ onOpenBuilder, onOpenPlaySetup, openSettings }) {
+  const { theme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
 
   return (
-    <main className="min-h-screen bg-[#2d3b9f] flex items-center justify-center p-6 text-slate-100">
-      <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-12">
-        <header className="text-center">
+    <main className={`min-h-screen ${t.bg} flex flex-col items-center justify-center p-6 text-slate-100 relative`}>
+      <div className="absolute top-6 right-6">
+        <button
+          type="button"
+          onClick={openSettings}
+          className="rounded-full bg-slate-900/90 p-2.5 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 hover:scale-105 transition shadow-lg cursor-pointer flex items-center justify-center shrink-0"
+          title="Settings"
+        >
+          <Settings className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-10">
+        <header className="text-center flex flex-col items-center">
           <h1 className="text-5xl font-extrabold tracking-tight text-white mb-4 drop-shadow-md">
             Trivia Builder + Host
           </h1>
@@ -97,10 +242,10 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
           <button
             type="button"
             onClick={onOpenBuilder}
-            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-indigo-500/30"
+            className={`group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-slate-900 hover:shadow-2xl ${t.primaryBorder} ${t.primaryShadow}`}
           >
-            <div className="mb-6 rounded-full bg-indigo-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-indigo-500/30">
-              <PencilLine className="h-10 w-10 text-indigo-400" />
+            <div className={`mb-6 rounded-full p-4 transition-transform duration-300 group-hover:scale-110 ${t.primaryBgLight}`}>
+              <PencilLine className={`h-10 w-10 ${t.primaryText}`} />
             </div>
             <h2 className="mb-3 text-2xl font-bold text-white tracking-wide">Create Board</h2>
             <p className="text-sm leading-relaxed text-slate-300">
@@ -111,10 +256,10 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
           <button
             type="button"
             onClick={onOpenPlaySetup}
-            className="group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-400 hover:bg-slate-900 hover:shadow-2xl hover:shadow-blue-500/30"
+            className={`group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-white/10 bg-slate-900/80 p-8 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-slate-900 hover:shadow-2xl ${t.accentBorder} ${t.accentShadow}`}
           >
-            <div className="mb-6 rounded-full bg-blue-500/20 p-4 transition-transform duration-300 group-hover:scale-110 group-hover:bg-blue-500/30">
-              <Play className="h-10 w-10 text-blue-400" />
+            <div className={`mb-6 rounded-full p-4 transition-transform duration-300 group-hover:scale-110 ${t.accentBgLight}`}>
+              <Play className={`h-10 w-10 ${t.accentText}`} />
             </div>
             <h2 className="mb-3 text-2xl font-bold text-white tracking-wide">Play Game</h2>
             <p className="text-sm leading-relaxed text-slate-300">
@@ -127,7 +272,7 @@ function HomeView({ onOpenBuilder, onOpenPlaySetup }) {
   )
 }
 
-function BuilderView({ onBack }) {
+function BuilderView({ onBack, openSettings }) {
   const {
     game,
     setGameTitle,
@@ -144,7 +289,10 @@ function BuilderView({ onBack }) {
     updateRowPoints,
     setGame,
     ensureCell,
+    theme,
   } = useGame()
+
+  const t = THEMES[theme] || THEMES.gold
 
   const [selectedCell, setSelectedCell] = useState(null)
   const [draggedCell, setDraggedCell] = useState(null)
@@ -161,6 +309,7 @@ function BuilderView({ onBack }) {
   const headerRef = useRef(null)
   const boardRef = useRef(null)
   const [boardHeight, setBoardHeight] = useState(520)
+  const [showHelp, setShowHelp] = useState(false)
 
   const rowCount = useMemo(() => game.rowPoints?.length ?? 0, [game.rowPoints])
 
@@ -263,47 +412,50 @@ function BuilderView({ onBack }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#2d3b9f] p-3 text-slate-100 md:p-4">
+    <main className={`min-h-screen ${t.bg} p-3 text-slate-100 md:p-4`}>
       <div className="mx-auto flex w-full max-w-full flex-col gap-4 px-4">
         <header ref={headerRef} className="rounded-xl bg-slate-900 p-4 shadow-lg">
-          <div className="relative flex flex-wrap items-center justify-between gap-3 mb-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-slate-800 transition"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Home
-            </button>
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <GameMenu onBack={onBack} openSettings={openSettings} align="left" className="shrink-0" />
+              <button
+                type="button"
+                onClick={() => setShowHelp(true)}
+                className="rounded-full bg-slate-850 p-2.5 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 transition hover:scale-105 shadow-lg flex items-center justify-center shrink-0 cursor-pointer"
+                title="Help & Gestures"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </button>
+            </div>
 
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-              <div className="rounded-md bg-slate-800/0 px-3 py-1 text-lg font-semibold text-white/95">Create Board</div>
+              <div className="rounded-md bg-slate-800/0 px-3 py-1 text-xl md:text-2xl font-bold text-white/95 tracking-wide">Create Board</div>
             </div>
 
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={addRow}
-                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                className={`rounded-lg px-3 py-2 text-sm font-semibold text-white transition ${t.primary}`}
               >
                 + Row
               </button>
               <button
                 type="button"
                 onClick={addColumn}
-                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                className={`rounded-lg px-3 py-2 text-sm font-semibold text-white transition ${t.primary}`}
               >
                 + Column
               </button>
               <button
                 type="button"
                 onClick={exportFile}
-                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-white transition ${t.primary}`}
               >
                 <FileUp className="h-4 w-4" />
                 Export
               </button>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition">
+              <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-white transition ${t.primary}`}>
                 <FileDown className="h-4 w-4" />
                 Import
                 <input
@@ -315,13 +467,10 @@ function BuilderView({ onBack }) {
               </label>
             </div>
           </div>
-          <p className="text-xs text-slate-300 leading-5">
-            Enter your game title and category names. Click a card to edit question/answer. Hover over filled cards to reveal answers.
-          </p>
         </header>
 
-        <section className="pt-6">
-          <div className="mx-auto mb-3 w-full max-w-4xl px-4">
+        <section className="pt-4">
+          <div className="mx-auto mb-6 w-full max-w-4xl px-4">
             <input
               value={game.title}
               onChange={(event) => setGameTitle(event.target.value)}
@@ -330,123 +479,32 @@ function BuilderView({ onBack }) {
             />
           </div>
 
-          <div ref={boardRef} className="overflow-x-auto rounded-xl border border-slate-700 bg-[#2d3b9f] pt-4 pb-2 px-4 shadow-lg" style={{ height: boardHeight }}>
-              <div
-                className="min-w-full h-full gap-1"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: `72px repeat(${game.categories.length}, minmax(120px, 1fr))`,
-                  gridTemplateRows: `auto repeat(${rowCount}, minmax(0, 1fr))`,
-                }}
-              >
-            <div className="h-full" />
-            {game.categories.map((category, categoryIndex) => (
-              <div key={category.id} className="h-full p-2">
-                <div
-                  draggable={editingCategoryId !== category.id}
-                  onDoubleClick={(event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    startEditingCategory(category.id)
-                  }}
-                  onDragStart={() => {
-                    dragActiveRef.current = true
-                    setDraggedCategoryIndex(categoryIndex)
-                  }}
-                  onDragEnd={() => {
-                    dragActiveRef.current = false
-                    setDraggedCategoryIndex(null)
-                  }}
-                  onDragOver={(event) => {
-                    event.preventDefault()
-                    event.dataTransfer.dropEffect = 'move'
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault()
-                    const source = draggedCategoryIndex
-                    dragActiveRef.current = false
-                    setDraggedCategoryIndex(null)
-                    if (source !== null && source !== categoryIndex) {
-                      swapCategories(source, categoryIndex)
-                    }
-                  }}
-                  className={`group relative mb-2 flex cursor-grab items-center justify-center rounded bg-transparent px-2 py-2 transition-opacity ${draggedCategoryIndex === categoryIndex ? 'opacity-40' : ''} ${editingCategoryId !== category.id ? '' : 'cursor-text'}`}
-                >
-                  {editingCategoryId === category.id ? (
-                    <input
-                      autoFocus
-                      value={category.name}
-                      onChange={(event) => updateCategoryName(category.id, event.target.value)}
-                      onFocus={(event) => event.currentTarget.select()}
-                      onBlur={() => setEditingCategoryId(null)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') setEditingCategoryId(null)
-                      }}
-                      className="w-full rounded border-none bg-transparent text-center text-lg font-semibold uppercase tracking-wide text-white outline-none placeholder:text-slate-200/60"
-                      placeholder="Enter Category Name"
-                    />
-                  ) : (
-                    <div className="w-full truncate text-center text-xl font-semibold uppercase tracking-wide text-white">
-                      {category.name}
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm(`Delete column "${category.name}"?`)) {
-                        removeCategory(category.id)
-                      }
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded bg-transparent p-1 text-white/90 opacity-0 transition group-hover:opacity-100 hover:bg-black/15"
-                    title="Remove column"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {Array.from({ length: rowCount }, (_, rowIndex) => (
-              <div
-                key={`row-${rowIndex}`}
-                className="contents"
-              >
-                    <div className="group relative h-full overflow-visible">
+          <div ref={boardRef} className={`overflow-x-auto rounded-xl border border-slate-700 ${t.boardBg} pt-4 pb-4 px-4 shadow-lg`} style={{ height: boardHeight }}>
+            <div
+              className="min-w-full h-full gap-1"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `72px repeat(${game.categories.length}, minmax(120px, 1fr))`,
+                gridTemplateRows: `auto repeat(${rowCount}, minmax(0, 1fr))`,
+              }}
+            >
+              <div className="h-full" />
+              {game.categories.map((category, categoryIndex) => (
+                <div key={category.id} className="h-full p-2">
                   <div
-                    draggable={editingRowIndex !== rowIndex}
-                    onMouseEnter={(event) => {
-                      if (hideFloatingRowDeleteRef.current) {
-                        window.clearTimeout(hideFloatingRowDeleteRef.current)
-                        hideFloatingRowDeleteRef.current = null
-                      }
-
-                      const rect = event.currentTarget.getBoundingClientRect()
-                      setFloatingRowDelete({
-                        rowIndex,
-                        top: rect.top + rect.height / 2,
-                        left: rect.left,
-                      })
-                    }}
-                    onMouseLeave={() => {
-                      hideFloatingRowDeleteRef.current = window.setTimeout(() => {
-                        setFloatingRowDelete((current) =>
-                          current?.rowIndex === rowIndex ? null : current,
-                        )
-                        hideFloatingRowDeleteRef.current = null
-                      }, 80)
-                    }}
+                    draggable={editingCategoryId !== category.id}
                     onDoubleClick={(event) => {
                       event.preventDefault()
                       event.stopPropagation()
-                      startEditingRow(rowIndex)
+                      startEditingCategory(category.id)
                     }}
                     onDragStart={() => {
                       dragActiveRef.current = true
-                      setDraggedRow(rowIndex)
+                      setDraggedCategoryIndex(categoryIndex)
                     }}
                     onDragEnd={() => {
                       dragActiveRef.current = false
-                      setDraggedRow(null)
+                      setDraggedCategoryIndex(null)
                     }}
                     onDragOver={(event) => {
                       event.preventDefault()
@@ -454,141 +512,230 @@ function BuilderView({ onBack }) {
                     }}
                     onDrop={(event) => {
                       event.preventDefault()
-                      const source = draggedRow
+                      const source = draggedCategoryIndex
                       dragActiveRef.current = false
-                      setDraggedRow(null)
-                      if (source !== null && source !== rowIndex) {
-                        swapRows(source, rowIndex)
+                      setDraggedCategoryIndex(null)
+                      if (source !== null && source !== categoryIndex) {
+                        swapCategories(source, categoryIndex)
                       }
                     }}
-                    className={`flex h-full w-full cursor-grab items-center justify-center rounded-[4px] border border-black/40 bg-[#2d3b9f] p-0 box-border text-white transition-opacity ${draggedRow === rowIndex ? 'opacity-40' : ''} ${editingRowIndex !== rowIndex ? '' : 'cursor-text'}`}
+                    className={`group relative mb-2 flex cursor-grab items-center justify-center rounded bg-transparent px-2 py-2 transition-opacity ${draggedCategoryIndex === categoryIndex ? 'opacity-40' : ''} ${editingCategoryId !== category.id ? '' : 'cursor-text'}`}
                   >
-                      {editingRowIndex === rowIndex ? (
+                    {editingCategoryId === category.id ? (
                       <input
                         autoFocus
-                        type="text"
-                        inputMode="numeric"
-                        value={editingRowValue}
-                        onChange={(event) => setEditingRowValue(event.target.value)}
+                        value={category.name}
+                        onChange={(event) => updateCategoryName(category.id, event.target.value)}
                         onFocus={(event) => event.currentTarget.select()}
-                        onBlur={commitEditingRow}
+                        onBlur={() => setEditingCategoryId(null)}
                         onKeyDown={(event) => {
-                          if (event.key === 'Enter') commitEditingRow()
-                          if (event.key === 'Escape') {
-                            setEditingRowIndex(null)
-                            setEditingRowValue('')
-                          }
+                          if (event.key === 'Enter') setEditingCategoryId(null)
                         }}
-                        className="w-full border-none bg-transparent text-center text-sm font-semibold outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-full rounded border-none bg-transparent text-center text-lg font-semibold uppercase tracking-wide text-white outline-none placeholder:text-slate-200/60"
+                        placeholder="Enter Category Name"
                       />
-                      ) : (
-                      <div className="text-center text-base font-semibold">
-                        {game.rowPoints?.[rowIndex] ?? (rowIndex + 1) * 100}
+                    ) : (
+                      <div className="w-full truncate text-center text-xl font-semibold uppercase tracking-wide text-white">
+                        {category.name}
                       </div>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(`Delete column "${category.name}"?`)) {
+                          removeCategory(category.id)
+                        }
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded bg-transparent p-1 text-white/90 opacity-0 transition group-hover:opacity-100 hover:bg-black/15"
+                      title="Remove column"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
+              ))}
 
-                {game.categories.map((category) => {
-                  const clue = category.clues[rowIndex] ?? null
-                  const questionHtml = clue?.question ? markdownToHtml(clue.question) : ''
-                  const answerHtml = clue?.answer ? markdownToHtml(clue.answer) : ''
-                  const points = game.rowPoints?.[rowIndex] ?? (rowIndex + 1) * 100
-                  const hasQuestion = Boolean(clue?.question?.trim())
-                  const hasAnswer = Boolean(clue?.answer?.trim())
-                  const hasContent = hasQuestion || hasAnswer
-                  const questionLength = questionHtml.length
-                  const answerLength = answerHtml.length
-                  const questionTextSize = questionLength > 220
-                    ? 'text-[0.7rem]'
-                    : questionLength > 140
-                    ? 'text-[0.8rem]'
-                    : questionLength > 90
-                    ? 'text-sm'
-                    : 'text-base'
-                  const answerTextSize = answerLength > 220
-                    ? 'text-[0.7rem]'
-                    : answerLength > 140
-                    ? 'text-[0.8rem]'
-                    : answerLength > 90
-                    ? 'text-sm'
-                    : 'text-base'
+              {Array.from({ length: rowCount }, (_, rowIndex) => (
+                <div
+                  key={`row-${rowIndex}`}
+                  className="contents"
+                >
+                  <div className="group relative h-full overflow-visible">
+                    <div
+                      draggable={editingRowIndex !== rowIndex}
+                      onMouseEnter={(event) => {
+                        if (hideFloatingRowDeleteRef.current) {
+                          window.clearTimeout(hideFloatingRowDeleteRef.current)
+                          hideFloatingRowDeleteRef.current = null
+                        }
 
-                  return (
-                    <button
-                      key={`${category.id}-${rowIndex}`}
-                      type="button"
-                      draggable={hasContent}
-                      onDragStart={hasContent ? (event) => {
+                        const rect = event.currentTarget.getBoundingClientRect()
+                        setFloatingRowDelete({
+                          rowIndex,
+                          top: rect.top + rect.height / 2,
+                          left: rect.left,
+                        })
+                      }}
+                      onMouseLeave={() => {
+                        hideFloatingRowDeleteRef.current = window.setTimeout(() => {
+                          setFloatingRowDelete((current) =>
+                            current?.rowIndex === rowIndex ? null : current,
+                          )
+                          hideFloatingRowDeleteRef.current = null
+                        }, 80)
+                      }}
+                      onDoubleClick={(event) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        startEditingRow(rowIndex)
+                      }}
+                      onDragStart={() => {
                         dragActiveRef.current = true
-                        suppressNextClickRef.current = true
-                        setDraggedCell({ categoryId: category.id, rowIndex })
-                        event.dataTransfer.effectAllowed = 'move'
-                        event.dataTransfer.setData('text/plain', `${category.id}:${rowIndex}`)
-                      } : undefined}
-                      onDragEnd={hasContent ? () => {
+                        setDraggedRow(rowIndex)
+                      }}
+                      onDragEnd={() => {
                         dragActiveRef.current = false
-                        setDraggedCell(null)
-                        window.setTimeout(() => {
-                          suppressNextClickRef.current = false
-                        }, 100)
-                      } : undefined}
+                        setDraggedRow(null)
+                      }}
                       onDragOver={(event) => {
                         event.preventDefault()
                         event.dataTransfer.dropEffect = 'move'
                       }}
                       onDrop={(event) => {
                         event.preventDefault()
-                        const source = draggedCell
+                        const source = draggedRow
                         dragActiveRef.current = false
-                        setDraggedCell(null)
-                        if (!source) return
-                        suppressNextClickRef.current = true
-                        window.setTimeout(() => {
-                          suppressNextClickRef.current = false
-                        }, 100)
-                        swapClueCells(source.categoryId, source.rowIndex, category.id, rowIndex)
+                        setDraggedRow(null)
+                        if (source !== null && source !== rowIndex) {
+                          swapRows(source, rowIndex)
+                        }
                       }}
-                      onClick={() => openCell(category.id, rowIndex)}
-                      className={`group h-full w-full rounded-[4px] [perspective:1200px] ${hasContent ? 'cursor-grab' : 'cursor-pointer'} transition-transform duration-150 hover:shadow-lg hover:brightness-105 ${
-                        draggedCell?.categoryId === category.id && draggedCell?.rowIndex === rowIndex
-                          ? 'opacity-40'
-                          : ''
-                      }`}
+                      className={`flex h-full w-full cursor-grab items-center justify-center rounded-[4px] border border-black/40 ${t.cellBg} p-0 box-border text-white transition-opacity ${draggedRow === rowIndex ? 'opacity-40' : ''} ${editingRowIndex !== rowIndex ? '' : 'cursor-text'}`}
                     >
-                      <div
-                        className={`relative h-full w-full transition-transform duration-350 [transform-style:preserve-3d] ${
-                          hasAnswer ? 'group-hover:[transform:rotateY(180deg)]' : ''
-                        }`}
-                      >
-                        <div className="pointer-events-none absolute inset-0 rounded-[4px] border border-black bg-[#2d3b9f] [backface-visibility:hidden] box-border">
-                          <div className={`h-full w-full flex items-center justify-center px-2 text-center font-bold leading-tight text-white overflow-hidden break-words whitespace-normal ${hasContent ? questionTextSize : 'text-base'}`}>
-                            <div className="w-full line-clamp-4">
-                              {hasContent ? (
-                                <div dangerouslySetInnerHTML={{ __html: questionHtml }} />
-                              ) : (
-                                <span className="text-white/55">{points}</span>
-                              )}
-                            </div>
-                          </div>
+                      {editingRowIndex === rowIndex ? (
+                        <input
+                          autoFocus
+                          type="text"
+                          inputMode="numeric"
+                          value={editingRowValue}
+                          onChange={(event) => setEditingRowValue(event.target.value)}
+                          onFocus={(event) => event.currentTarget.select()}
+                          onBlur={commitEditingRow}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') commitEditingRow()
+                            if (event.key === 'Escape') {
+                              setEditingRowIndex(null)
+                              setEditingRowValue('')
+                            }
+                          }}
+                          className="w-full border-none bg-transparent text-center text-sm font-semibold outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        />
+                      ) : (
+                        <div className="text-center text-base font-semibold">
+                          {game.rowPoints?.[rowIndex] ?? (rowIndex + 1) * 100}
                         </div>
+                      )}
+                    </div>
+                  </div>
 
-                        <div className="pointer-events-none absolute inset-0 rounded-[4px] border border-black bg-indigo-600 [backface-visibility:hidden] [transform:rotateY(180deg)] box-border">
-                          <div className={`h-full w-full flex items-center justify-center px-2 text-center font-bold leading-tight text-white overflow-hidden break-words whitespace-normal ${answerHtml ? answerTextSize : 'text-base'}`}>
-                            <div className="w-full line-clamp-4">
-                              {answerHtml ? (
-                                <div dangerouslySetInnerHTML={{ __html: answerHtml }} />
-                              ) : null}
+                  {game.categories.map((category) => {
+                    const clue = category.clues[rowIndex] ?? null
+                    const questionHtml = clue?.question ? markdownToHtml(clue.question) : ''
+                    const answerHtml = clue?.answer ? markdownToHtml(clue.answer) : ''
+                    const points = game.rowPoints?.[rowIndex] ?? (rowIndex + 1) * 100
+                    const hasQuestion = Boolean(clue?.question?.trim())
+                    const hasAnswer = Boolean(clue?.answer?.trim())
+                    const hasContent = hasQuestion || hasAnswer
+                    const questionLength = questionHtml.length
+                    const answerLength = answerHtml.length
+                    const questionTextSize = questionLength > 220
+                      ? 'text-[0.7rem]'
+                      : questionLength > 140
+                        ? 'text-[0.8rem]'
+                        : questionLength > 90
+                          ? 'text-sm'
+                          : 'text-base'
+                    const answerTextSize = answerLength > 220
+                      ? 'text-[0.7rem]'
+                      : answerLength > 140
+                        ? 'text-[0.8rem]'
+                        : answerLength > 90
+                          ? 'text-sm'
+                          : 'text-base'
+
+                    return (
+                      <button
+                        key={`${category.id}-${rowIndex}`}
+                        type="button"
+                        draggable={hasContent}
+                        onDragStart={hasContent ? (event) => {
+                          dragActiveRef.current = true
+                          suppressNextClickRef.current = true
+                          setDraggedCell({ categoryId: category.id, rowIndex })
+                          event.dataTransfer.effectAllowed = 'move'
+                          event.dataTransfer.setData('text/plain', `${category.id}:${rowIndex}`)
+                        } : undefined}
+                        onDragEnd={hasContent ? () => {
+                          dragActiveRef.current = false
+                          setDraggedCell(null)
+                          window.setTimeout(() => {
+                            suppressNextClickRef.current = false
+                          }, 100)
+                        } : undefined}
+                        onDragOver={(event) => {
+                          event.preventDefault()
+                          event.dataTransfer.dropEffect = 'move'
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault()
+                          const source = draggedCell
+                          dragActiveRef.current = false
+                          setDraggedCell(null)
+                          if (!source) return
+                          suppressNextClickRef.current = true
+                          window.setTimeout(() => {
+                            suppressNextClickRef.current = false
+                          }, 100)
+                          swapClueCells(source.categoryId, source.rowIndex, category.id, rowIndex)
+                        }}
+                        onClick={() => openCell(category.id, rowIndex)}
+                        className={`group h-full w-full rounded-[4px] [perspective:1200px] ${hasContent ? 'cursor-grab' : 'cursor-pointer'} transition-transform duration-150 hover:shadow-lg hover:brightness-105 ${draggedCell?.categoryId === category.id && draggedCell?.rowIndex === rowIndex
+                            ? 'opacity-40'
+                            : ''
+                          }`}
+                      >
+                        <div
+                          className={`relative h-full w-full transition-transform duration-350 [transform-style:preserve-3d] ${hasAnswer ? 'group-hover:[transform:rotateY(180deg)]' : ''
+                            }`}
+                        >
+                          <div className={`pointer-events-none absolute inset-0 rounded-[4px] border border-black [backface-visibility:hidden] box-border ${t.cellBg}`}>
+                            <div className={`h-full w-full flex items-center justify-center px-2 text-center font-bold leading-tight text-white overflow-hidden break-words whitespace-normal ${hasContent ? questionTextSize : 'text-base'}`}>
+                              <div className="w-full line-clamp-4">
+                                {hasContent ? (
+                                  <div dangerouslySetInnerHTML={{ __html: questionHtml }} />
+                                ) : (
+                                  <span className="text-white/55">{points}</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={`pointer-events-none absolute inset-0 rounded-[4px] border border-black [backface-visibility:hidden] [transform:rotateY(180deg)] box-border ${t.primary}`}>
+                            <div className={`h-full w-full flex items-center justify-center px-2 text-center font-bold leading-tight text-white overflow-hidden break-words whitespace-normal ${answerHtml ? answerTextSize : 'text-base'}`}>
+                              <div className="w-full line-clamp-4">
+                                {answerHtml ? (
+                                  <div dangerouslySetInnerHTML={{ __html: answerHtml }} />
+                                ) : null}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </div>
@@ -643,11 +790,78 @@ function BuilderView({ onBack }) {
           <Trash2 className="h-3 w-3" />
         </button>
       ) : null}
+
+      {showHelp && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95 duration-200 text-left">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-slate-400" />
+                Board Builder Guide
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-slate-300">
+              <div>
+                <h3 className="text-sm font-bold text-white mb-1">✍️ The Basics</h3>
+                <ul className="list-disc pl-5 text-xs space-y-1.5 text-slate-400">
+                  <li><strong>Game Title:</strong> Click the large centered title to rename your game.</li>
+                  <li><strong>Categories:</strong> Click the category name headers to rename categories.</li>
+                  <li><strong>Points:</strong> Click points on the left grid edge to change point amounts.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-white mb-1">🃏 Clues & Answers</h3>
+                <ul className="list-disc pl-5 text-xs space-y-1.5 text-slate-400">
+                  <li><strong>Editing Clues:</strong> Click any cell to open the rich editor where you can input the question, answer, and attach images.</li>
+                  <li><strong>Previews:</strong> Hover over any filled cell to quickly peek at the answer.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-white mb-1">🔄 Drag & Drop Gestures</h3>
+                <ul className="list-disc pl-5 text-xs space-y-1.5 text-slate-400">
+                  <li><strong>Rearrange Board:</strong> Drag and drop any <strong>Category header</strong> or <strong>Row points label</strong> to instantly shift the columns or rows.</li>
+                  <li><strong>Swap Cards:</strong> Click and drag a <strong>clue cell</strong> onto another cell to instantly swap their contents.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-white mb-1">💾 Save & Host</h3>
+                <ul className="list-disc pl-5 text-xs space-y-1.5 text-slate-400">
+                  <li><strong>Save Progress:</strong> Click the <strong>Export</strong> button to save your entire custom game board to a file on your device.</li>
+                  <li><strong>Host a Match:</strong> Head to the Home screen, choose <strong>Host Board</strong>, and upload your exported file to start a live multiplayer match!</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end border-t border-slate-800 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className={`rounded-lg px-5 py-2 text-sm font-semibold text-white transition ${t.primary} cursor-pointer`}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
 
 function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
+  const { theme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
   const [questionHtml, setQuestionHtml] = useState(
     clue.question && clue.question.includes('<') ? clue.question : markdownToHtml(clue.question),
   )
@@ -753,7 +967,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
       window.setTimeout(() => {
         const entry = selectionMapRef.current.get(el)
         if (entry && entry.marker && entry.marker.parentNode) {
-          try { entry.marker.remove() } catch (e) {}
+          try { entry.marker.remove() } catch (e) { }
         }
         selectionMapRef.current.delete(el)
       }, 15000)
@@ -797,7 +1011,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
     }
     try {
       el.focus()
-    } catch (e) {}
+    } catch (e) { }
 
     // Try to use the saved marker (most reliable) to insert at the exact caret position.
     const entry = selectionMapRef.current.get(el)
@@ -816,7 +1030,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
       // Restore selection (saved before opening file dialog) so insertion happens at caret
       try {
         restoreSelectionForRef(ref)
-      } catch (e) {}
+      } catch (e) { }
 
       // Insert the image node at the caret position for contentEditable.
       const sel = window.getSelection()
@@ -835,11 +1049,11 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
 
     // Sync React state with the live DOM so the image persists.
     setter(el.innerHTML)
-    
+
     // Cleanup selection map and markers
     if (entry) {
       if (entry.marker && entry.marker.parentNode) {
-        try { entry.marker.remove() } catch (e) {}
+        try { entry.marker.remove() } catch (e) { }
       }
       selectionMapRef.current.delete(el)
     }
@@ -898,7 +1112,7 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
       <div className="w-full max-w-5xl overflow-hidden rounded-xl border border-slate-700 bg-slate-900 text-slate-50 shadow-2xl">
-        <div className="flex items-center justify-between bg-indigo-600 px-4 py-3 text-white font-semibold">
+        <div className={`flex items-center justify-between px-4 py-3 text-white font-semibold ${t.primary}`}>
           <div className="text-lg font-medium">Enter {title} clue</div>
           <button type="button" onClick={onClose} className="rounded px-2 py-1 text-sm hover:bg-white/15">
             Close without Saving [ESC]
@@ -1016,8 +1230,9 @@ function BoardCellModal({ title, clue, onClose, onSave, onDelete }) {
   )
 }
 
-function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
-  const { setGame, game } = useGame()
+function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart, openSettings }) {
+  const { setGame, game, theme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
   const [fileLoaded, setFileLoaded] = useState(false)
 
   const handleFileUpload = async (event) => {
@@ -1036,16 +1251,11 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#2d3b9f] flex items-center justify-center p-6 text-slate-100">
+    <main className={`min-h-screen ${t.bg} flex items-center justify-center p-6 text-slate-100`}>
       <div className="mx-auto w-full max-w-xl rounded-2xl border-2 border-white/10 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-sm">
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-6 inline-flex items-center gap-2 rounded-md bg-slate-800/50 px-3 py-2 text-sm font-medium transition hover:bg-slate-700"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </button>
+        <div className="mb-6">
+          <GameMenu onBack={onBack} openSettings={openSettings} align="left" />
+        </div>
 
         <h2 className="text-3xl font-bold tracking-tight text-white">Host Setup</h2>
         <p className="mt-2 text-slate-300">Upload your game file and set the number of players to start.</p>
@@ -1055,7 +1265,7 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
             <span className="mb-2 block text-sm font-semibold text-slate-300 uppercase tracking-wider">
               1. Load Game File
             </span>
-            <label className={`flex cursor-pointer items-center justify-between rounded-xl border-2 ${fileLoaded ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-blue-400/50'} p-4 transition-all`}>
+            <label className={`flex cursor-pointer items-center justify-between rounded-xl border-2 ${fileLoaded ? 'border-emerald-500/50 bg-emerald-500/10' : `border-slate-700 bg-slate-800/50 ${t.accentBorder}/50`} p-4 transition-all`}>
               <div className="flex items-center gap-3">
                 <FileUp className={`h-6 w-6 ${fileLoaded ? 'text-emerald-400' : 'text-slate-400'}`} />
                 <div>
@@ -1102,7 +1312,7 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
           type="button"
           onClick={onStart}
           disabled={!fileLoaded}
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-lg font-bold text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+          className={`mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-bold text-white transition-all disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 ${t.accent}`}
         >
           <Play className="h-5 w-5" />
           Start Game
@@ -1112,12 +1322,13 @@ function PlaySetupView({ playerCount, setPlayerCount, onBack, onStart }) {
   )
 }
 
-function PlayHostView({ players, setPlayers, onBack }) {
-  const { game } = useGame()
+function PlayHostView({ players, setPlayers, onBack, openSettings }) {
+  const { game, theme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
   const [playedCells, setPlayedCells] = useState(new Set())
   const [activeCell, setActiveCell] = useState(null)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
-  
+
   const [boardHeight, setBoardHeight] = useState(520)
   const titleRowRef = useRef(null)
   const CARD_H = 112
@@ -1139,7 +1350,7 @@ function PlayHostView({ players, setPlayers, onBack }) {
     const recalc = () => {
       const titleRect = titleRowRef.current?.getBoundingClientRect()
       const top = titleRect ? titleRect.bottom : 0
-      const available = Math.max(320, window.innerHeight - top - CARD_H - 12)
+      const available = Math.max(320, window.innerHeight - top - 70 - 48)
       setBoardHeight(available)
     }
     recalc()
@@ -1148,31 +1359,26 @@ function PlayHostView({ players, setPlayers, onBack }) {
   }, [rowCount, game.categories.length])
 
   return (
-    <main className="h-screen bg-[#2d3b9f] px-3 pt-3 text-slate-100 md:px-4 md:pt-4 flex flex-col overflow-hidden" style={{ paddingBottom: CARD_H }}>
-      <div className="flex w-full max-w-full flex-col gap-3 px-4 flex-1 min-h-0">
+    <main className={`h-screen ${t.bg} px-3 pt-6 text-slate-100 md:px-4 md:pt-8 flex flex-col overflow-hidden`} style={{ paddingBottom: 70 }}>
+      <div className="flex w-full max-w-full flex-col gap-12 px-4 flex-1 min-h-0">
 
         {/* Title row: Home | Game Title | Score Pool — no dark bar */}
-        <div ref={titleRowRef} className="relative flex items-center justify-between gap-4 pt-2">
-          <button
-            type="button"
-            onClick={() => setShowExitConfirm(true)}
-            className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-white/80 hover:bg-white/10 transition shrink-0"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Home
-          </button>
+        <div ref={titleRowRef} className="relative flex items-center justify-between gap-4 mt-4">
+          <div className="flex items-center gap-3 shrink-0">
+            <GameMenu onBack={() => setShowExitConfirm(true)} openSettings={openSettings} align="left" className="shrink-0" />
+          </div>
 
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-3xl md:text-4xl font-bold text-white truncate pointer-events-none">
+          <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white truncate pointer-events-none max-w-[40%] md:max-w-[50%] lg:max-w-[60%] text-center">
             {game.title || 'Trivia Board'}
           </h1>
 
-          <div className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shrink-0">
+          <div className={`rounded-lg px-3 py-2 text-sm font-semibold text-white shrink-0 shadow-md transition ${t.primary}`}>
             Score Pool: {totalScore}
           </div>
         </div>
 
         {/* Game board */}
-        <div className="overflow-x-auto rounded-xl border border-slate-700 bg-[#2d3b9f] pt-4 pb-2 px-4 shadow-lg flex-1 min-h-0" style={{ height: boardHeight }}>
+        <div className={`overflow-x-auto rounded-xl border border-slate-700 ${t.boardBg} pt-4 pb-4 px-4 shadow-lg flex-1 min-h-0`} style={{ height: boardHeight }}>
           <div
             className="min-w-full h-full gap-1"
             style={{
@@ -1206,9 +1412,16 @@ function PlayHostView({ players, setPlayers, onBack }) {
                           setActiveCell({ categoryId: category.id, categoryName: category.name, rowIndex, points, clue, originRect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height } })
                         }
                       }}
-                      className={`flex h-full w-full items-center justify-center rounded-[4px] border-2 bg-[#2d3b9f] box-border text-white transition-all border-black/50 cursor-pointer hover:bg-[#3d4bbf] hover:scale-[1.03] shadow-md font-bold text-2xl
-                        ${isPlayed ? 'opacity-40' : ''}
-                      `}
+                      className={`flex h-full w-full items-center justify-center rounded-[4px] border-2 ${t.cellBg} box-border text-white transition-all border-black/50 cursor-pointer hover:scale-[1.03] shadow-md font-bold text-2xl hover:text-white ${theme === 'gold'
+                          ? 'hover:bg-amber-600 hover:border-amber-400'
+                          : theme === 'emerald'
+                            ? 'hover:bg-emerald-600 hover:border-emerald-400'
+                            : theme === 'cyan'
+                              ? 'hover:bg-cyan-600 hover:border-cyan-400'
+                              : theme === 'purple'
+                                ? 'hover:bg-indigo-600 hover:border-indigo-400'
+                                : 'hover:bg-slate-600 hover:border-slate-300'
+                        } ${isPlayed ? 'opacity-40' : ''}`}
                     >
                       <span>{points}</span>
                     </button>
@@ -1295,6 +1508,8 @@ function PlayHostView({ players, setPlayers, onBack }) {
 }
 
 function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
+  const { theme } = useGame()
+  const t = THEMES[theme] || THEMES.gold
   const [expanded, setExpanded] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -1336,7 +1551,7 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
       style={{
         position: 'fixed',
         zIndex: 100,
-        backgroundColor: '#2d3b9f',
+        backgroundColor: t.bgHex || '#2d3b9f',
         color: 'white',
         overflow: 'hidden',
         transition,
@@ -1372,7 +1587,7 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
           />
           {showAnswer && (
             <>
-              <div className="w-full max-w-4xl border-t-2 border-dashed border-white/40 mb-8" />
+              <div className={`w-full max-w-4xl border-t-2 border-dashed mb-8 ${t.border}`} />
               <div
                 style={{ animation: 'answerReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards' }}
                 className="text-2xl sm:text-4xl md:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
