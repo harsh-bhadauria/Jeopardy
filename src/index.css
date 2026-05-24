@@ -19,6 +19,28 @@ body {
   opacity: 1;
 }
 
+.clue-prompt-text img {
+  width: 100% !important;
+  max-width: 550px !important;
+  max-height: 35vh !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border-radius: 12px !important;
+  display: block !important;
+  margin: 12px auto !important;
+}
+
+.clue-answer-text img {
+  width: 70vw !important;
+  max-width: 900px !important;
+  max-height: 60vh !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border-radius: 16px !important;
+  display: block !important;
+  margin: 24px auto !important;
+}
+
 h1,
 h2,
 h3,

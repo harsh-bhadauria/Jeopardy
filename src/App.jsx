@@ -36,7 +36,7 @@ function App() {
   )
 }
 
-function GameMenu({ onBack, openSettings, align = 'left', className = '' }) {
+function GameMenu({ onBack, openSettings, align = 'left', dropUp = false, className = '' }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -55,7 +55,7 @@ function GameMenu({ onBack, openSettings, align = 'left', className = '' }) {
           <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
           <div
             className={`absolute ${align === 'left' ? 'left-0' : 'right-0'
-              } mt-2 w-56 rounded-xl border border-slate-700 bg-slate-950 p-2 shadow-2xl z-40 animate-in fade-in slide-in-from-top-2 duration-150 text-left`}
+              } ${dropUp ? 'bottom-full mb-2' : 'mt-2'} w-56 rounded-xl border border-slate-700 bg-slate-950 p-2 shadow-2xl z-40 animate-in fade-in ${dropUp ? 'slide-in-from-bottom-2' : 'slide-in-from-top-2'} duration-150 text-left`}
           >
             <div className="space-y-1">
               {onBack && (
@@ -490,7 +490,7 @@ function BuilderView({ onBack, openSettings }) {
             >
               <div className="h-full" />
               {game.categories.map((category, categoryIndex) => (
-                <div key={category.id} className="h-full p-2">
+                <div key={category.id} className="h-full p-2 flex items-center">
                   <div
                     draggable={editingCategoryId !== category.id}
                     onDoubleClick={(event) => {
@@ -519,23 +519,34 @@ function BuilderView({ onBack, openSettings }) {
                         swapCategories(source, categoryIndex)
                       }
                     }}
-                    className={`group relative mb-2 flex cursor-grab items-center justify-center rounded bg-transparent px-2 py-2 transition-opacity ${draggedCategoryIndex === categoryIndex ? 'opacity-40' : ''} ${editingCategoryId !== category.id ? '' : 'cursor-text'}`}
+                    className={`group relative flex w-full cursor-grab items-center justify-center rounded bg-transparent px-2 py-2 transition-opacity ${draggedCategoryIndex === categoryIndex ? 'opacity-40' : ''} ${editingCategoryId !== category.id ? '' : 'cursor-text'}`}
                   >
                     {editingCategoryId === category.id ? (
-                      <input
+                      <textarea
                         autoFocus
+                        rows={1}
                         value={category.name}
                         onChange={(event) => updateCategoryName(category.id, event.target.value)}
-                        onFocus={(event) => event.currentTarget.select()}
+                        onFocus={(event) => {
+                          event.currentTarget.select()
+                          const el = event.currentTarget
+                          el.style.height = 'auto'
+                          el.style.height = el.scrollHeight + 'px'
+                        }}
+                        onInput={(event) => {
+                          const el = event.currentTarget
+                          el.style.height = 'auto'
+                          el.style.height = el.scrollHeight + 'px'
+                        }}
                         onBlur={() => setEditingCategoryId(null)}
                         onKeyDown={(event) => {
-                          if (event.key === 'Enter') setEditingCategoryId(null)
+                          if (event.key === 'Enter') { event.preventDefault(); setEditingCategoryId(null) }
                         }}
-                        className="w-full rounded border-none bg-transparent text-center text-lg font-semibold uppercase tracking-wide text-white outline-none placeholder:text-slate-200/60"
+                        className="w-full resize-none overflow-hidden rounded border-none bg-transparent text-center text-xl font-semibold uppercase tracking-wide text-white outline-none leading-tight placeholder:text-slate-200/60"
                         placeholder="Enter Category Name"
                       />
                     ) : (
-                      <div className="w-full truncate text-center text-xl font-semibold uppercase tracking-wide text-white">
+                      <div className="w-full text-center text-xl font-semibold uppercase tracking-wide text-white leading-tight" style={{ wordBreak: 'break-word' }}>
                         {category.name}
                       </div>
                     )}
@@ -1329,8 +1340,6 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
   const [activeCell, setActiveCell] = useState(null)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
 
-  const [boardHeight, setBoardHeight] = useState(520)
-  const titleRowRef = useRef(null)
   const CARD_H = 112
 
   const totalScore = useMemo(
@@ -1346,39 +1355,11 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
 
   const rowCount = useMemo(() => game.rowPoints?.length ?? 0, [game.rowPoints])
 
-  useEffect(() => {
-    const recalc = () => {
-      const titleRect = titleRowRef.current?.getBoundingClientRect()
-      const top = titleRect ? titleRect.bottom : 0
-      const available = Math.max(320, window.innerHeight - top - 70 - 48)
-      setBoardHeight(available)
-    }
-    recalc()
-    window.addEventListener('resize', recalc)
-    return () => window.removeEventListener('resize', recalc)
-  }, [rowCount, game.categories.length])
-
   return (
-    <main className={`h-screen ${t.bg} px-3 pt-6 text-slate-100 md:px-4 md:pt-8 flex flex-col overflow-hidden ${t.font || 'font-sans'}`} style={{ paddingBottom: 70 }}>
-      <div className="flex w-full max-w-full flex-col gap-12 px-4 flex-1 min-h-0">
+    <main className={`h-screen ${t.bg} px-3 pt-4 text-slate-100 md:px-4 flex flex-col overflow-hidden ${t.font || 'font-sans'}`} style={{ paddingBottom: 78 }}>
 
-        {/* Title row: Home | Game Title | Score Pool — no dark bar */}
-        <div ref={titleRowRef} className="relative flex items-center justify-between gap-4 mt-4">
-          <div className="flex items-center gap-3 shrink-0">
-            <GameMenu onBack={() => setShowExitConfirm(true)} openSettings={openSettings} align="left" className="shrink-0" />
-          </div>
-
-          <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white truncate pointer-events-none max-w-[40%] md:max-w-[50%] lg:max-w-[60%] text-center">
-            {game.title || 'Trivia Board'}
-          </h1>
-
-          <div className={`rounded-lg px-3 py-2 text-sm font-semibold text-white shrink-0 shadow-md transition ${t.primary}`}>
-            Score Pool: {totalScore}
-          </div>
-        </div>
-
-        {/* Game board */}
-        <div className={`overflow-x-auto rounded-xl border border-slate-700 ${t.boardBg} pt-4 pb-4 px-4 shadow-lg flex-1 min-h-0`} style={{ height: boardHeight }}>
+        {/* Game board — fills from near the top */}
+        <div className={`relative overflow-x-auto rounded-xl border border-slate-700 ${t.boardBg} pt-4 pb-4 px-4 shadow-lg flex-1 min-h-0`}>
           <div
             className="min-w-full h-full gap-1"
             style={{
@@ -1388,8 +1369,11 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
             }}
           >
             {game.categories.map((category) => (
-              <div key={category.id} className="h-full p-2">
-                <div className="w-full truncate text-center text-xl font-semibold uppercase tracking-wide text-white">
+              <div key={category.id} className="h-full p-2 flex items-center">
+                <div
+                  className="w-full text-center text-xl font-semibold uppercase tracking-wide text-white leading-tight"
+                  style={{ wordBreak: 'break-word' }}
+                >
                   {category.name}
                 </div>
               </div>
@@ -1422,44 +1406,63 @@ function PlayHostView({ players, setPlayers, onBack, openSettings }) {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Fixed floating score cards — always above modal */}
+      {/* Bottom bar: Menu | Title | Player Cards | Score Pool */}
       <div
-        className="fixed bottom-0 left-0 right-0 flex justify-center gap-2 z-[200] pointer-events-none"
+        className="fixed bottom-0 left-0 right-0 z-[200] pointer-events-none px-4"
         style={{ height: CARD_H }}
       >
-        {players.map((player) => (
-          <div key={player.id} className="flex flex-col rounded-t-xl border border-slate-700 bg-slate-900 p-3 shadow-lg w-36 pointer-events-auto">
-            <input
-              value={player.name}
-              onChange={(event) => updatePlayer(player.id, { name: event.target.value })}
-              className="w-full rounded bg-transparent px-1 py-0.5 text-center font-bold text-white outline-none hover:bg-slate-800 focus:bg-slate-800 transition text-xs"
-            />
-            <input
-              type="number"
-              value={player.score}
-              onChange={(event) => updatePlayer(player.id, { score: Number(event.target.value) })}
-              className="mt-1 w-full rounded bg-transparent px-1 py-0.5 text-center text-xl font-extrabold text-white outline-none hover:bg-slate-800 focus:bg-slate-800 transition [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            />
-            <div className="mt-2 flex w-full">
-              <button
-                type="button"
-                onClick={() => updatePlayer(player.id, { score: player.score + (activeCell ? activeCell.points : 100) })}
-                className="flex-1 py-1 text-base font-bold text-emerald-400 hover:bg-emerald-950/60 transition rounded-l"
-              >
-                +
-              </button>
-              <button
-                type="button"
-                onClick={() => updatePlayer(player.id, { score: player.score - (activeCell ? activeCell.points : 100) })}
-                className="flex-1 py-1 text-base font-bold text-rose-400 hover:bg-rose-950/60 transition rounded-r"
-              >
-                −
-              </button>
+        {/* Left: Menu + Title — absolutely positioned */}
+        <div className="absolute left-4 bottom-3 flex items-center pointer-events-auto">
+          <GameMenu onBack={() => setShowExitConfirm(true)} openSettings={openSettings} align="left" dropUp />
+        </div>
+
+        {/* Center: Player Cards — truly centered */}
+        <div className="flex justify-center gap-2 h-full">
+          {players.map((player) => (
+            <div key={player.id} className="flex flex-col rounded-t-xl border-t border-x border-slate-700 bg-slate-900 p-3 shadow-lg w-36 pointer-events-auto h-full justify-between">
+              <div>
+                <input
+                  value={player.name}
+                  onChange={(event) => updatePlayer(player.id, { name: event.target.value })}
+                  className="w-full rounded bg-transparent px-1 py-0.5 text-center font-bold text-white outline-none hover:bg-slate-800 focus:bg-slate-800 transition text-xs"
+                />
+                <input
+                  type="number"
+                  value={player.score}
+                  onChange={(event) => updatePlayer(player.id, { score: Number(event.target.value) })}
+                  className="mt-1 w-full rounded bg-transparent px-1 py-0.5 text-center text-xl font-extrabold text-white outline-none hover:bg-slate-800 focus:bg-slate-800 transition [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                />
+              </div>
+              <div className="mt-2 flex w-full">
+                <button
+                  type="button"
+                  onClick={() => updatePlayer(player.id, { score: player.score + (activeCell ? activeCell.points : 100) })}
+                  className="flex-1 py-1 text-base font-bold text-emerald-400 hover:bg-emerald-950/60 transition rounded-l"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updatePlayer(player.id, { score: player.score - (activeCell ? activeCell.points : 100) })}
+                  className="flex-1 py-1 text-base font-bold text-rose-400 hover:bg-rose-950/60 transition rounded-r"
+                >
+                  −
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+
+        {/* Right: Score Pool — absolutely positioned */}
+        <div className={`absolute right-4 bottom-3 rounded-lg px-4 py-2 text-right shadow-md pointer-events-auto ${t.primary}`}>
+          <div className="text-[10px] font-medium text-white/70 tracking-wide uppercase leading-none mb-1">
+            {game.title || 'Trivia Board'}
           </div>
-        ))}
+          <div className="text-sm font-bold text-white leading-none">
+            Score Pool: {totalScore}
+          </div>
+        </div>
       </div>
 
       {activeCell && (
@@ -1507,6 +1510,7 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
   const questionHtml = cell.clue?.question ? markdownToHtml(cell.clue.question) : ''
   const answerHtml = cell.clue?.answer ? markdownToHtml(cell.clue.answer) : ''
   const { originRect } = cell
+  const dividerRef = useRef(null)
 
   useEffect(() => {
     const id1 = requestAnimationFrame(() => {
@@ -1528,6 +1532,17 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
+
+  useEffect(() => {
+    if (showAnswer) {
+      const tid = setTimeout(() => {
+        if (dividerRef.current) {
+          dividerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 80)
+      return () => clearTimeout(tid)
+    }
+  }, [showAnswer])
 
   const transition = 'top 420ms cubic-bezier(0.4,0,0.2,1), left 420ms cubic-bezier(0.4,0,0.2,1), width 420ms cubic-bezier(0.4,0,0.2,1), height 420ms cubic-bezier(0.4,0,0.2,1), border-radius 420ms cubic-bezier(0.4,0,0.2,1)'
 
@@ -1572,21 +1587,23 @@ function HostPlayModal({ cell, cardHeight, onClose, onMarkDone }) {
           </button>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
-          <div
-            className="clue-prompt-text text-3xl sm:text-5xl md:text-7xl font-semibold leading-tight drop-shadow-md mb-8 max-w-6xl break-words"
-            dangerouslySetInnerHTML={{ __html: questionHtml || '<span class="text-slate-400 italic">No question</span>' }}
-          />
-          {showAnswer && (
-            <>
-              <div className={`w-full max-w-6xl border-t-4 border-dotted mb-8 ${t.border}`} />
-              <div
-                style={{ animation: 'answerReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards' }}
-                className="clue-prompt-text text-2xl sm:text-4xl md:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
-                dangerouslySetInnerHTML={{ __html: answerHtml || '<span class="text-slate-400 italic">No answer</span>' }}
-              />
-            </>
-          )}
+        <div className="flex-1 overflow-y-auto p-8 text-center" style={{ paddingTop: showAnswer ? 48 : 0, paddingBottom: showAnswer ? cardHeight + 32 : 0 }}>
+          <div className="min-h-full flex flex-col items-center justify-center w-full">
+            <div
+              className="clue-prompt-text text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight drop-shadow-md mb-8 max-w-6xl break-words"
+              dangerouslySetInnerHTML={{ __html: questionHtml || '<span class="text-slate-400 italic">No question</span>' }}
+            />
+            {showAnswer && (
+              <>
+                <div ref={dividerRef} className={`w-full max-w-6xl border-t-4 border-dotted mb-8 ${t.border}`} />
+                <div
+                  style={{ animation: 'answerReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards' }}
+                  className="clue-answer-text clue-prompt-text text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white drop-shadow-md max-w-6xl break-words"
+                  dangerouslySetInnerHTML={{ __html: answerHtml || '<span class="text-slate-400 italic">No answer</span>' }}
+                />
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -1605,7 +1622,7 @@ function markdownToHtml(markdownText) {
     .replaceAll('>', '&gt;')
 
   return escaped
-    .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img alt="$1" src="$2" style="max-width:45px;height:auto;border-radius:8px;display:block;margin:4px auto;" />')
+    .replace(/!\[(.*?)\]\((.*?)\)/gim, '<img alt="$1" src="$2" style="max-width:85%;max-height:45vh;height:auto;width:auto;object-fit:contain;border-radius:12px;display:block;margin:16px auto;" />')
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
